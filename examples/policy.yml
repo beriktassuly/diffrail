@@ -1,0 +1,27 @@
+version: 1
+
+policy:
+  protected:
+    - ".agent-change-control.yml"
+    - ".github/**"
+  shared:
+    - "schemas/**"
+    - "src/contracts/**"
+
+tasks:
+  checkout-ui:
+    description: "Update the checkout interface without changing shared contracts"
+    allow:
+      - "web/checkout/**"
+      - "tests/checkout/**"
+    allow_shared: []
+    allow_protected: []
+
+  checkout-contract:
+    description: "Update the checkout interface and its approved contract"
+    allow:
+      - "web/checkout/**"
+      - "tests/checkout/**"
+    allow_shared:
+      - "src/contracts/checkout.ts"
+    allow_protected: []

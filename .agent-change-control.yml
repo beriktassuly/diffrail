@@ -1,0 +1,69 @@
+version: 1
+
+policy:
+  protected:
+    - ".agent-change-control.yml"
+    - ".github/**"
+  shared:
+    - "action.yml"
+    - "plugin.json"
+    - ".agents/**"
+    - ".claude-plugin/**"
+    - "skills/**"
+
+tasks:
+  core:
+    description: "Change the checker implementation and tests"
+    allow:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "src/**"
+      - "tests/**"
+    allow_shared: []
+    allow_protected: []
+
+  documentation:
+    description: "Change documentation and examples"
+    allow:
+      - "README.md"
+      - "docs/**"
+      - "examples/**"
+    allow_shared: []
+    allow_protected: []
+
+  packaging:
+    description: "Change portable plugin and action packaging"
+    allow:
+      - "README.md"
+      - "docs/**"
+      - "examples/**"
+    allow_shared:
+      - "action.yml"
+      - "plugin.json"
+      - ".agents/**"
+      - ".claude-plugin/**"
+      - "skills/**"
+    allow_protected: []
+
+  maintenance:
+    description: "Maintain repository policy, automation, and project metadata"
+    allow:
+      - ".gitattributes"
+      - ".gitignore"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "LICENSE"
+      - "README.md"
+      - "docs/**"
+      - "examples/**"
+      - "src/**"
+      - "tests/**"
+    allow_shared:
+      - "action.yml"
+      - "plugin.json"
+      - ".agents/**"
+      - ".claude-plugin/**"
+      - "skills/**"
+    allow_protected:
+      - ".agent-change-control.yml"
+      - ".github/**"

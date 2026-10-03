@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: 1.85.0
+          components: rustfmt, clippy
+      - run: cargo fmt --all --check
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: 1.85.0
+      - run: cargo test --locked --all-features
+
+  action-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out action source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: .action
+          persist-credentials: false
+      - name: Create fixture repository
+        id: fixture
+        shell: bash
+        run: |
+          mkdir fixture
+          cd fixture
+          git init -q
+          git config user.name "Test User"
+          git config user.email "test@example.com"
+          mkdir -p src
+          printf '%s\n' \
+            'version: 1' \
+            'policy: {}' \
+            'tasks:' \
+            '  app:' \
+            '    allow: ["src/**"]' \
+            > .agent-change-control.yml
+          echo 'fn main() {}' > src/main.rs
+          git add --all
+          git commit -q -m seed
+          echo 'fn main() { println!("ok"); }' > src/main.rs
+          echo "base=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Run local action
+        uses: ./.action
+        with:
+          task: app
+          base: ${{ steps.fixture.outputs.base }}
+          repository: ${{ github.workspace }}/fixture
+      - name: Add an out-of-scope change
+        shell: bash
+        run: echo blocked > fixture/outside.txt
+      - name: Verify violation failure
+        id: violation
+        continue-on-error: true
+        uses: ./.action
+        with:
+          task: app
+          base: ${{ steps.fixture.outputs.base }}
+          repository: ${{ github.workspace }}/fixture
+      - name: Assert violation was blocked
+        if: steps.violation.outcome != 'failure'
+        shell: bash
+        run: exit 1

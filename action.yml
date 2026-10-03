@@ -1,0 +1,55 @@
+name: Agent Change Control
+description: Check changed files against a task boundary stored in the trusted Git base
+author: Beriktassuly
+
+inputs:
+  task:
+    description: Task ID defined in .agent-change-control.yml
+    required: true
+  base:
+    description: Trusted base commit or revision
+    required: true
+  head:
+    description: Head commit or revision
+    required: false
+    default: HEAD
+  config:
+    description: Repository-relative policy path
+    required: false
+    default: .agent-change-control.yml
+  repository:
+    description: Repository path to check; defaults to the current GitHub workspace
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+      with:
+        toolchain: 1.85.0
+    - name: Check change boundary
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        ACC_TASK: ${{ inputs.task }}
+        ACC_BASE: ${{ inputs.base }}
+        ACC_HEAD: ${{ inputs.head }}
+        ACC_CONFIG: ${{ inputs.config }}
+        ACC_REPOSITORY: ${{ inputs.repository }}
+      run: |
+        repository="${ACC_REPOSITORY:-$GITHUB_WORKSPACE}"
+        cargo run --quiet --locked \
+          --manifest-path "$GITHUB_ACTION_PATH/Cargo.toml" \
+          -- \
+          --repo "$repository" \
+          check \
+          --task "$ACC_TASK" \
+          --base "$ACC_BASE" \
+          --head "$ACC_HEAD" \
+          --config "$ACC_CONFIG" \
+          --format github
+
+branding:
+  icon: check-circle
+  color: blue

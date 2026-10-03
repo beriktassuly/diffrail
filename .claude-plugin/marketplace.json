@@ -1,0 +1,21 @@
+{
+  "name": "agent-change-control",
+  "owner": {
+    "name": "Beriktassuly"
+  },
+  "metadata": {
+    "description": "Scoped repository change checks for coding workflows."
+  },
+  "plugins": [
+    {
+      "name": "agent-change-control",
+      "displayName": "Agent Change Control",
+      "description": "Checks repository changes against declared task boundaries before merge.",
+      "author": {
+        "name": "Beriktassuly"
+      },
+      "repository": "https://github.com/beriktassuly/agent-change-control",
+      "source": "./"
+    }
+  ]
+}

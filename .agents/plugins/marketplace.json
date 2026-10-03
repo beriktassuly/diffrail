@@ -1,0 +1,20 @@
+{
+  "name": "agent-change-control",
+  "interface": {
+    "displayName": "Agent Change Control"
+  },
+  "plugins": [
+    {
+      "name": "agent-change-control",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
