@@ -9,6 +9,7 @@ policy:
     - "plugin.json"
     - ".agents/**"
     - ".claude-plugin/**"
+    - ".cursor-plugin/**"
     - "skills/**"
 
 tasks:
@@ -42,6 +43,7 @@ tasks:
       - "plugin.json"
       - ".agents/**"
       - ".claude-plugin/**"
+      - ".cursor-plugin/**"
       - "skills/**"
     allow_protected: []
 
@@ -63,6 +65,7 @@ tasks:
       - "plugin.json"
       - ".agents/**"
       - ".claude-plugin/**"
+      - ".cursor-plugin/**"
       - "skills/**"
     allow_protected:
       - ".diffrail.yml"
