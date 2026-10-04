@@ -1,6 +1,23 @@
-# DiffRail
-
-Policy checks for scoped repository changes.
+<div align="center">
+  <h1>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/diffrail-wordmark-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="docs/assets/diffrail-wordmark.svg">
+      <img src="docs/assets/diffrail-wordmark.svg" alt="DiffRail" width="420" height="105">
+    </picture>
+  </h1>
+  <p>Keep repository changes inside explicit file boundaries.</p>
+  <p>
+    <a href="https://github.com/beriktassuly/diffrail/actions/workflows/ci.yml"><img src="https://github.com/beriktassuly/diffrail/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status"></a>
+    <a href="https://github.com/beriktassuly/diffrail/releases/latest"><img src="https://img.shields.io/github/v/release/beriktassuly/diffrail?color=335CFF" alt="Latest release"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111318" alt="MIT license"></a>
+  </p>
+  <p>
+    <a href="#quick-start">Quick start</a> &middot;
+    <a href="docs/policy-reference.md">Policy reference</a> &middot;
+    <a href="docs/brand.md">Brand assets</a>
+  </p>
+</div>
 
 DiffRail gives each coding task an explicit file boundary, treats shared contracts separately, and blocks out-of-scope changes before merge. In base-aware mode, the policy is read from the exact trusted base revision instead of the branch being checked, so that branch cannot widen its own permissions.
 

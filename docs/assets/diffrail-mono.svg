@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">DiffRail monochrome mark</title>
+  <path fill="#111318" transform="translate(-1 0)" d="M10 8H31C46.46 8 56 18.28 56 32C56 46.52 46.46 56 31 56H10V46H31C40.5 46 46 40.5 46 32C46 23.5 40.5 18 31 18H20V35H10ZM26 25H31C35.8 25 39 27.8 39 32C39 36.2 35.8 39 31 39H26V34H31C32.5 34 33 33.2 33 32C33 30.8 32.5 30 31 30H26Z"/>
+</svg>
