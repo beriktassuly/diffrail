@@ -2,7 +2,7 @@ version: 1
 
 policy:
   protected:
-    - ".agent-change-control.yml"
+    - ".diffrail.yml"
     - ".github/**"
   shared:
     - "schemas/**"

@@ -176,7 +176,7 @@ fn render_human(quiet: bool, report: &CheckReport) {
 fn render_github(report: &CheckReport) {
     for violation in &report.violations {
         println!(
-            "::error file={}::agent-change-control: {}",
+            "::error file={}::DiffRail: {}",
             github_property(&violation.path),
             github_message(&violation.message)
         );

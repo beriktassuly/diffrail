@@ -55,7 +55,7 @@ impl TestRepo {
     }
 
     fn seed(&self) -> String {
-        self.write(".agent-change-control.yml", POLICY);
+        self.write(".diffrail.yml", POLICY);
         self.write("src/app.rs", "fn main() {}\n");
         self.write("src/contracts/api.rs", "pub struct Api;\n");
         self.write("outside.txt", "baseline\n");
@@ -63,7 +63,7 @@ impl TestRepo {
     }
 
     fn command(&self) -> assert_cmd::Command {
-        let mut command = cargo_bin_cmd!("agent-change-control");
+        let mut command = cargo_bin_cmd!("diffrail");
         command.arg("--repo").arg(self.path());
         command
     }
@@ -74,7 +74,7 @@ fn init_is_safe_and_does_not_overwrite() {
     let repo = TestRepo::new();
 
     repo.command().arg("init").assert().success();
-    let original = fs::read(repo.path().join(".agent-change-control.yml")).unwrap();
+    let original = fs::read(repo.path().join(".diffrail.yml")).unwrap();
 
     repo.command()
         .arg("init")
@@ -84,7 +84,7 @@ fn init_is_safe_and_does_not_overwrite() {
 
     assert_eq!(
         original,
-        fs::read(repo.path().join(".agent-change-control.yml")).unwrap()
+        fs::read(repo.path().join(".diffrail.yml")).unwrap()
     );
 }
 
@@ -119,7 +119,7 @@ fn local_check_reports_untracked_outside_scope() {
 #[test]
 fn ignored_untracked_files_are_not_checked() {
     let repo = TestRepo::new();
-    repo.write(".agent-change-control.yml", POLICY);
+    repo.write(".diffrail.yml", POLICY);
     repo.write(".gitignore", "ignored.log\n");
     repo.write("src/app.rs", "fn main() {}\n");
     repo.commit_all("seed");
@@ -137,7 +137,7 @@ fn working_copy_cannot_authorize_its_own_policy_change() {
     let repo = TestRepo::new();
     repo.seed();
     let widened = POLICY.replace("allow_protected: []", "allow_protected: [\"**\"]");
-    repo.write(".agent-change-control.yml", &widened);
+    repo.write(".diffrail.yml", &widened);
 
     repo.command()
         .args(["check", "--task", "app"])
@@ -145,7 +145,7 @@ fn working_copy_cannot_authorize_its_own_policy_change() {
         .code(1)
         .stdout(
             predicate::str::contains("protected_path")
-                .and(predicate::str::contains(".agent-change-control.yml")),
+                .and(predicate::str::contains(".diffrail.yml")),
         );
 }
 
@@ -185,7 +185,7 @@ fn base_check_rejects_committed_policy_self_widening() {
     let repo = TestRepo::new();
     let base = repo.seed();
     let widened = POLICY.replace("allow_protected: []", "allow_protected: [\"**\"]");
-    repo.write(".agent-change-control.yml", &widened);
+    repo.write(".diffrail.yml", &widened);
     repo.write(".github/workflows/release.yml", "name: release\n");
     repo.commit_all("widen policy");
 
@@ -194,7 +194,7 @@ fn base_check_rejects_committed_policy_self_widening() {
         .assert()
         .code(1)
         .stdout(
-            predicate::str::contains(".agent-change-control.yml")
+            predicate::str::contains(".diffrail.yml")
                 .and(predicate::str::contains(".github/workflows/release.yml")),
         );
 }
@@ -206,7 +206,7 @@ fn base_check_uses_newer_policy_from_diverged_base() {
         "      - \".gitignore\"",
         "      - \".gitignore\"\n      - \"outside.txt\"",
     );
-    repo.write(".agent-change-control.yml", &permissive);
+    repo.write(".diffrail.yml", &permissive);
     repo.write("src/app.rs", "fn main() {}\n");
     repo.write("outside.txt", "baseline\n");
     let fork_point = repo.commit_all("permissive policy");
@@ -215,7 +215,7 @@ fn base_check_uses_newer_policy_from_diverged_base() {
     let feature_head = repo.commit_all("feature change");
 
     run_git(repo.path(), ["checkout", "-q", "--detach", &fork_point]);
-    repo.write(".agent-change-control.yml", POLICY);
+    repo.write(".diffrail.yml", POLICY);
     let trusted_base = repo.commit_all("tighten policy");
 
     repo.command()

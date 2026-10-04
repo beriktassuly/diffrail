@@ -1,11 +1,11 @@
 {
-  "name": "agent-change-control",
+  "name": "diffrail",
   "interface": {
-    "displayName": "Agent Change Control"
+    "displayName": "DiffRail"
   },
   "plugins": [
     {
-      "name": "agent-change-control",
+      "name": "diffrail",
       "source": {
         "source": "local",
         "path": "./"

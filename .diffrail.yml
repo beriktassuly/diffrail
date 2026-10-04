@@ -2,7 +2,6 @@ version: 1
 
 policy:
   protected:
-    - ".agent-change-control.yml"
     - ".diffrail.yml"
     - ".github/**"
   shared:
@@ -66,6 +65,5 @@ tasks:
       - ".claude-plugin/**"
       - "skills/**"
     allow_protected:
-      - ".agent-change-control.yml"
       - ".diffrail.yml"
       - ".github/**"

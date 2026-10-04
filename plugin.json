@@ -1,12 +1,12 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "agent-change-control",
-  "version": "0.1.0",
+  "name": "diffrail",
+  "version": "0.2.0",
   "description": "Checks repository changes against declared task boundaries before merge.",
   "author": {
     "name": "Beriktassuly"
   },
-  "repository": "https://github.com/beriktassuly/agent-change-control",
+  "repository": "https://github.com/beriktassuly/diffrail",
   "license": "MIT",
   "keywords": [
     "change-control",

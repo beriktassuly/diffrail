@@ -127,7 +127,7 @@ mod tests {
         let result = evaluate(
             &config,
             task,
-            Path::new(".agent-change-control.yml"),
+            Path::new(".diffrail.yml"),
             vec![changed(".github/workflows/ci.yml")],
         )
         .unwrap();
@@ -153,8 +153,8 @@ mod tests {
         let result = evaluate(
             &config,
             task,
-            Path::new(".agent-change-control.yml"),
-            vec![changed(".agent-change-control.yml")],
+            Path::new(".diffrail.yml"),
+            vec![changed(".diffrail.yml")],
         )
         .unwrap();
 
@@ -183,7 +183,7 @@ mod tests {
         let result = evaluate(
             &config,
             task,
-            Path::new(".agent-change-control.yml"),
+            Path::new(".diffrail.yml"),
             vec![
                 changed("src/contracts/approved.rs"),
                 changed("src/contracts/other.rs"),

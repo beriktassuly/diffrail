@@ -2,7 +2,7 @@ use std::process::ExitCode;
 
 use clap::Parser;
 
-use agent_change_control::{cli::Cli, execute, report::ErrorReport};
+use diffrail::{cli::Cli, execute, report::ErrorReport};
 
 fn main() -> ExitCode {
     let cli = Cli::parse();

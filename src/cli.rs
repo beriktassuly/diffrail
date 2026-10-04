@@ -5,7 +5,7 @@ use serde::Serialize;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "agent-change-control",
+    name = "diffrail",
     version,
     about = "Enforce scoped repository changes with a policy stored in Git"
 )]
@@ -32,14 +32,14 @@ pub enum Command {
     /// Create a safe starter policy in the repository root.
     Init {
         /// Repository-relative policy path.
-        #[arg(long, default_value = ".agent-change-control.yml", value_name = "PATH")]
+        #[arg(long, default_value = ".diffrail.yml", value_name = "PATH")]
         config: PathBuf,
     },
 
     /// Validate the policy currently present in the working tree.
     Validate {
         /// Repository-relative policy path.
-        #[arg(long, default_value = ".agent-change-control.yml", value_name = "PATH")]
+        #[arg(long, default_value = ".diffrail.yml", value_name = "PATH")]
         config: PathBuf,
 
         /// Output format.
@@ -62,7 +62,7 @@ pub enum Command {
         head: String,
 
         /// Repository-relative policy path.
-        #[arg(long, default_value = ".agent-change-control.yml", value_name = "PATH")]
+        #[arg(long, default_value = ".diffrail.yml", value_name = "PATH")]
         config: PathBuf,
 
         /// Output format.

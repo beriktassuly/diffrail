@@ -1,6 +1,6 @@
 # Policy reference
 
-Agent Change Control uses one versioned YAML file at the repository root. The default path is `.agent-change-control.yml`.
+DiffRail uses one versioned YAML file at the repository root. The default path is `.diffrail.yml`.
 
 ## Evaluation order
 
@@ -52,4 +52,4 @@ Use the immutable pull-request base SHA and fetch full history so Git can resolv
 
 Because a pull request can propose changes to its own workflow, pair the check with a required status check and your repository's existing branch or ruleset protections. A path checker is not authoritative if the checked branch can silently replace the check itself.
 
-Version 0.1 evaluates the raw head diff from the merge-base; it does not construct a prospective merge tree. If your CI platform checks a branch head instead of a generated pull-request merge result, require the branch to be current with the base before accepting the result. This avoids missing a collision where the base branch renamed a path into a protected location after the feature branch diverged.
+Version 0.2 evaluates the raw head diff from the merge-base; it does not construct a prospective merge tree. If your CI platform checks a branch head instead of a generated pull-request merge result, require the branch to be current with the base before accepting the result. This avoids missing a collision where the base branch renamed a path into a protected location after the feature branch diverged.

@@ -1,5 +1,5 @@
 {
-  "name": "agent-change-control",
+  "name": "diffrail",
   "owner": {
     "name": "Beriktassuly"
   },
@@ -8,13 +8,13 @@
   },
   "plugins": [
     {
-      "name": "agent-change-control",
-      "displayName": "Agent Change Control",
+      "name": "diffrail",
+      "displayName": "DiffRail",
       "description": "Checks repository changes against declared task boundaries before merge.",
       "author": {
         "name": "Beriktassuly"
       },
-      "repository": "https://github.com/beriktassuly/agent-change-control",
+      "repository": "https://github.com/beriktassuly/diffrail",
       "source": "./"
     }
   ]

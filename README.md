@@ -1,8 +1,8 @@
-# Agent Change Control
+# DiffRail
 
 Policy checks for scoped repository changes.
 
-Agent Change Control gives each coding task an explicit file boundary, treats shared contracts separately, and blocks out-of-scope changes before merge. In base-aware mode, the policy is read from the exact trusted base revision instead of the branch being checked, so that branch cannot widen its own permissions.
+DiffRail gives each coding task an explicit file boundary, treats shared contracts separately, and blocks out-of-scope changes before merge. In base-aware mode, the policy is read from the exact trusted base revision instead of the branch being checked, so that branch cannot widen its own permissions.
 
 ## What ships
 
@@ -17,35 +17,35 @@ The CLI is the enforcement layer. The plugin is the workflow and distribution la
 Prerequisites are Git and Rust 1.85 or newer. Install the CLI and verify it is available:
 
 ```sh
-cargo install --git https://github.com/beriktassuly/agent-change-control --tag v0.1.0 --locked
-agent-change-control --version
+cargo install --git https://github.com/beriktassuly/diffrail --tag v0.2.0 --locked
+diffrail --version
 ```
 
 Initialize a repository:
 
 ```sh
-agent-change-control init
+diffrail init
 ```
 
-Edit the generated `.agent-change-control.yml`, validate it, and commit it to the base branch before assigning work:
+Edit the generated `.diffrail.yml`, validate it, and commit it to the base branch before assigning work:
 
 ```sh
-agent-change-control validate
-git add .agent-change-control.yml
+diffrail validate
+git add .diffrail.yml
 git commit -m "chore: define change boundaries"
 ```
 
 Before committing, check staged, unstaged, and untracked work against the policy already committed at `HEAD`:
 
 ```sh
-agent-change-control check --task example
+diffrail check --task example
 ```
 
 After the branch contains commits, compare it with its trusted base:
 
 ```sh
 git fetch origin main
-agent-change-control check --task example --base origin/main
+diffrail check --task example --base origin/main
 ```
 
 Exit code `0` means every changed path is authorized. Exit code `1` means the change crossed its declared boundary.
@@ -57,7 +57,7 @@ version: 1
 
 policy:
   protected:
-    - ".agent-change-control.yml"
+    - ".diffrail.yml"
     - ".github/**"
   shared:
     - "schemas/**"
@@ -104,7 +104,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: beriktassuly/agent-change-control@v0.1.0
+      - uses: beriktassuly/diffrail@v0.2.0
         with:
           task: checkout-ui
           base: ${{ github.event.pull_request.base.sha }}
@@ -119,7 +119,7 @@ The action compiles the small CLI from the selected revision and emits inline an
 Use JSON for automation:
 
 ```sh
-agent-change-control check \
+diffrail check \
   --task checkout-ui \
   --base origin/main \
   --format json
@@ -133,13 +133,13 @@ Install the CLI first; plugin hosts do not install the executable. Then add the 
 
 | Host | Installation |
 | --- | --- |
-| Cursor | For local testing, clone or copy the repository to `~/.cursor/plugins/local/agent-change-control`, then reload Cursor. After marketplace review, install it from **Customize → Plugins**. |
-| Claude Code | Run `/plugin marketplace add beriktassuly/agent-change-control@v0.1.0`, then `/plugin install agent-change-control@agent-change-control`. |
-| ChatGPT desktop / Codex | Run `codex plugin marketplace add beriktassuly/agent-change-control --ref v0.1.0`, then `codex plugin add agent-change-control@agent-change-control`. Restart the desktop app after the first install. |
+| Cursor | For local testing, clone or copy the repository to `~/.cursor/plugins/local/diffrail`, then reload Cursor. After marketplace review, install it from **Customize → Plugins**. |
+| Claude Code | Run `/plugin marketplace add beriktassuly/diffrail@v0.2.0`, then `/plugin install diffrail@diffrail`. |
+| ChatGPT desktop / Codex | Run `codex plugin marketplace add beriktassuly/diffrail --ref v0.2.0`, then `codex plugin add diffrail@diffrail`. Restart the desktop app after the first install. |
 
 If Codex has its plugin feature disabled, enable it first with `codex features enable plugins`.
 
-The root `plugin.json` and `skills/change-control/SKILL.md` are the portable package. Host-specific marketplace metadata exposes the same skill without duplicating its instructions. The skill verifies that the CLI exists before claiming a successful check.
+The root `plugin.json` and `skills/diffrail/SKILL.md` are the portable package. Host-specific marketplace metadata exposes the same skill without duplicating its instructions. The skill verifies that the CLI exists before claiming a successful check.
 
 An MCP server is intentionally not part of this version. Local Git already supplies every capability needed by the checker; adding a server would increase installation and trust surface without strengthening enforcement. A service interface becomes useful later for centrally assigned tasks, organization policies, or audit history.
 
@@ -151,7 +151,7 @@ With `--base`, the CLI reads policy from that exact trusted base revision and ev
 
 Base-aware checking prevents a branch from changing the policy and using those new rules in the same check. It does not authenticate who selected `--task`, and it cannot protect a workflow that a pull request is allowed to replace.
 
-Version 0.1 checks file boundaries. It does not detect semantic conflicts, coordinate locks, run project tests, or prove that two individually valid changes integrate correctly.
+Version 0.2 checks file boundaries. It does not detect semantic conflicts, coordinate locks, run project tests, or prove that two individually valid changes integrate correctly.
 
 The base-aware check evaluates a branch diff, not a prospective merge tree. On CI systems that check a raw branch head rather than a generated pull-request merge result, require the branch to be current with its base before treating the result as authoritative.
 

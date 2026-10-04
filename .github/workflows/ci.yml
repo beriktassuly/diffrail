@@ -61,7 +61,7 @@ jobs:
             'tasks:' \
             '  app:' \
             '    allow: ["src/**"]' \
-            > .agent-change-control.yml
+            > .diffrail.yml
           echo 'fn main() {}' > src/main.rs
           git add --all
           git commit -q -m seed

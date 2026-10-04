@@ -22,7 +22,7 @@ pub const CONFIG_TEMPLATE: &str = r#"version: 1
 
 policy:
   protected:
-    - ".agent-change-control.yml"
+    - ".diffrail.yml"
     - ".github/**"
   shared:
     - "schemas/**"
@@ -125,10 +125,7 @@ fn init(repo: &Repository, config: &Path) -> AppResult<u8> {
 
     println!("Created {}", config_path.display());
     println!("Edit the task boundaries, validate them, and commit the policy before use.");
-    println!(
-        "Next: agent-change-control validate --config {}",
-        config_path.display()
-    );
+    println!("Next: diffrail validate --config {}", config_path.display());
     Ok(0)
 }
 

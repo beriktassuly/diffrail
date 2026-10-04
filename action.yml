@@ -1,10 +1,10 @@
-name: Agent Change Control
+name: DiffRail
 description: Check changed files against a task boundary stored in the trusted Git base
 author: Beriktassuly
 
 inputs:
   task:
-    description: Task ID defined in .agent-change-control.yml
+    description: Task ID defined in .diffrail.yml
     required: true
   base:
     description: Trusted base commit or revision
@@ -16,7 +16,7 @@ inputs:
   config:
     description: Repository-relative policy path
     required: false
-    default: .agent-change-control.yml
+    default: .diffrail.yml
   repository:
     description: Repository path to check; defaults to the current GitHub workspace
     required: false
@@ -32,22 +32,22 @@ runs:
       shell: bash
       working-directory: ${{ github.action_path }}
       env:
-        ACC_TASK: ${{ inputs.task }}
-        ACC_BASE: ${{ inputs.base }}
-        ACC_HEAD: ${{ inputs.head }}
-        ACC_CONFIG: ${{ inputs.config }}
-        ACC_REPOSITORY: ${{ inputs.repository }}
+        DIFFRAIL_TASK: ${{ inputs.task }}
+        DIFFRAIL_BASE: ${{ inputs.base }}
+        DIFFRAIL_HEAD: ${{ inputs.head }}
+        DIFFRAIL_CONFIG: ${{ inputs.config }}
+        DIFFRAIL_REPOSITORY: ${{ inputs.repository }}
       run: |
-        repository="${ACC_REPOSITORY:-$GITHUB_WORKSPACE}"
+        repository="${DIFFRAIL_REPOSITORY:-$GITHUB_WORKSPACE}"
         cargo run --quiet --locked \
           --manifest-path "$GITHUB_ACTION_PATH/Cargo.toml" \
           -- \
           --repo "$repository" \
           check \
-          --task "$ACC_TASK" \
-          --base "$ACC_BASE" \
-          --head "$ACC_HEAD" \
-          --config "$ACC_CONFIG" \
+          --task "$DIFFRAIL_TASK" \
+          --base "$DIFFRAIL_BASE" \
+          --head "$DIFFRAIL_HEAD" \
+          --config "$DIFFRAIL_CONFIG" \
           --format github
 
 branding:

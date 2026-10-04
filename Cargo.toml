@@ -1,11 +1,11 @@
 [package]
-name = "agent-change-control"
-version = "0.1.0"
+name = "diffrail"
+version = "0.2.0"
 edition = "2024"
 authors = ["Beriktassuly <berektasulymuhammedali@gmail.com>"]
-description = "Policy checks for scoped repository changes"
+description = "Keep repository changes inside explicit file boundaries."
 license = "MIT"
-repository = "https://github.com/beriktassuly/agent-change-control"
+repository = "https://github.com/beriktassuly/diffrail"
 keywords = ["git", "policy", "ci", "change-control"]
 categories = ["command-line-utilities", "development-tools"]
 rust-version = "1.85"
