@@ -1,9 +1,9 @@
 <div align="center">
   <h1>
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/diffrail-wordmark-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="docs/assets/diffrail-wordmark.svg">
-      <img src="docs/assets/diffrail-wordmark.svg" alt="DiffRail" width="420" height="105">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/beriktassuly/diffrail/v0.2.1/docs/assets/diffrail-wordmark-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/beriktassuly/diffrail/v0.2.1/docs/assets/diffrail-wordmark.svg">
+      <img src="https://raw.githubusercontent.com/beriktassuly/diffrail/v0.2.1/docs/assets/diffrail-wordmark.svg" alt="DiffRail" width="420" height="105">
     </picture>
   </h1>
   <p>Keep repository changes inside explicit file boundaries.</p>
