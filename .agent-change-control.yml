@@ -3,6 +3,7 @@ version: 1
 policy:
   protected:
     - ".agent-change-control.yml"
+    - ".diffrail.yml"
     - ".github/**"
   shared:
     - "action.yml"
@@ -66,4 +67,5 @@ tasks:
       - "skills/**"
     allow_protected:
       - ".agent-change-control.yml"
+      - ".diffrail.yml"
       - ".github/**"
