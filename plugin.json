@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "diffrail",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Checks repository changes against declared task boundaries before merge.",
   "author": {
     "name": "Beriktassuly"
@@ -13,5 +13,29 @@
     "git",
     "ci",
     "code-review"
-  ]
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "DiffRail",
+        "shortDescription": "Keep code changes in scope",
+        "longDescription": "Check repository changes against explicit file boundaries for the task assigned by the user or a trusted workflow. DiffRail distinguishes ordinary files, shared contracts, and protected paths, and can check against policy from a trusted Git base revision. Requires Git, the separately installed DiffRail CLI, and a host that can run local terminal commands in the repository. This skills-only plugin guides the workflow; the CLI performs the check. It does not sandbox file access, authenticate task assignment, detect semantic conflicts, or run project tests. The installed CLI makes no network calls.",
+        "developerName": "Beriktassuly",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Validate repository policy",
+          "Check task file boundaries"
+        ],
+        "websiteURL": "https://github.com/beriktassuly/diffrail",
+        "supportURL": "https://github.com/beriktassuly/diffrail/issues",
+        "defaultPrompt": [
+          "Check this repository's changes against the task boundary I assigned."
+        ],
+        "brandColor": "#335CFF",
+        "brandColorDark": "#819AFF",
+        "composerIcon": "./docs/assets/diffrail-icon.svg",
+        "logo": "./docs/assets/diffrail-icon.svg"
+      }
+    }
+  }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "diffrail",
+  "version": "0.2.1",
+  "description": "Checks repository changes against declared task boundaries before merge. Requires Git and the separately installed DiffRail CLI.",
+  "author": {
+    "name": "Beriktassuly"
+  },
+  "homepage": "https://github.com/beriktassuly/diffrail",
+  "repository": "https://github.com/beriktassuly/diffrail",
+  "license": "MIT",
+  "keywords": ["change-control", "git", "ci", "code-review"],
+  "logo": "docs/assets/diffrail-icon.svg"
+}

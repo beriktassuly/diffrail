@@ -31,12 +31,27 @@ The CLI is the enforcement layer. The plugin is the workflow and distribution la
 
 ## Quick start
 
-Prerequisites are Git and Rust 1.85 or newer. Install the CLI and verify it is available:
+Git is required. For an installation without Rust, download the archive for your platform from [GitHub Releases](https://github.com/beriktassuly/diffrail/releases/tag/v0.2.1), verify it against `SHA256SUMS`, extract it, and put the executable on your `PATH`:
+
+| Platform | Archive |
+| --- | --- |
+| Windows x64 | `diffrail-v0.2.1-x86_64-pc-windows-msvc.zip` |
+| Linux x64 | `diffrail-v0.2.1-x86_64-unknown-linux-gnu.tar.gz` |
+| macOS Apple Silicon | `diffrail-v0.2.1-aarch64-apple-darwin.tar.gz` |
+| macOS Intel | `diffrail-v0.2.1-x86_64-apple-darwin.tar.gz` |
+
+On macOS and Linux, retain executable permissions (`chmod +x diffrail` if needed). On Windows, the executable is `diffrail.exe`.
+
+The Linux archive requires a GNU/glibc environment with glibc 2.35 or newer, not Alpine/musl. Downloads are unsigned: Windows and macOS may ask you to approve the executable. Code signing and macOS notarization are not included in this release.
+
+Alternatively, with Git and Rust 1.85 or newer, install from the tagged source:
 
 ```sh
-cargo install --git https://github.com/beriktassuly/diffrail --tag v0.2.0 --locked
+cargo install --git https://github.com/beriktassuly/diffrail --tag v0.2.1 --locked
 diffrail --version
 ```
+
+The crates.io package is published separately. Use the release archives or tagged Git installation until that publication is confirmed.
 
 Initialize a repository:
 
@@ -121,7 +136,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: beriktassuly/diffrail@v0.2.0
+      - uses: beriktassuly/diffrail@v0.2.1
         with:
           task: checkout-ui
           base: ${{ github.event.pull_request.base.sha }}
@@ -150,13 +165,17 @@ Install the CLI first; plugin hosts do not install the executable. Then add the 
 
 | Host | Installation |
 | --- | --- |
-| Cursor | For local testing, clone or copy the repository to `~/.cursor/plugins/local/diffrail`, then reload Cursor. After marketplace review, install it from **Customize → Plugins**. |
-| Claude Code | Run `/plugin marketplace add beriktassuly/diffrail@v0.2.0`, then `/plugin install diffrail@diffrail`. |
-| ChatGPT desktop / Codex | Run `codex plugin marketplace add beriktassuly/diffrail --ref v0.2.0`, then `codex plugin add diffrail@diffrail`. Restart the desktop app after the first install. |
+| Cursor | Extract the plugin ZIP from the release into `~/.cursor/plugins/local/diffrail`, then reload Cursor. Official marketplace installation is available only after review and publication. |
+| Claude Code | Run `/plugin marketplace add beriktassuly/diffrail`, then `/plugin install diffrail@diffrail`. Choose the installation scope when prompted. |
+| ChatGPT desktop / Codex | Run `codex plugin marketplace add beriktassuly/diffrail --ref v0.2.1`, then `codex plugin add diffrail@diffrail`. Start a new session and restart the desktop app after the first install. |
 
 If Codex has its plugin feature disabled, enable it first with `codex features enable plugins`.
 
-The root `plugin.json` and `skills/diffrail/SKILL.md` are the portable package. Host-specific marketplace metadata exposes the same skill without duplicating its instructions. The skill verifies that the CLI exists before claiming a successful check.
+The root `plugin.json` and `skills/diffrail/SKILL.md` are the portable package. Host-specific metadata exposes the same skill without duplicating its instructions. The skill verifies that the CLI exists before claiming a successful check. Local plugin imports may be restricted by an organization's host settings.
+
+The release includes `diffrail-plugin-v0.2.1.zip` for local installation and skills-only submissions. It does not bundle the CLI. A host must have access to the repository and be able to run local terminal commands; a listing in a web directory does not provide that access.
+
+GitHub marketplace installation and official directory publication are separate. See the [publishing checklist](docs/publishing.md) for submission steps, data-handling facts, and publisher verification requirements. This repository does not claim that official directory listings are already approved.
 
 An MCP server is intentionally not part of this version. Local Git already supplies every capability needed by the checker; adding a server would increase installation and trust surface without strengthening enforcement. A service interface becomes useful later for centrally assigned tasks, organization policies, or audit history.
 
@@ -179,5 +198,7 @@ cargo fmt --all --check
 cargo clippy --locked --all-targets --all-features -- -D warnings
 cargo test --locked --all-features
 ```
+
+Release builds also validate manifest versions, listing icons, and isolated allowed/denied changes. The [release workflow](https://github.com/beriktassuly/diffrail/blob/main/.github/workflows/release.yml) builds all four platforms and creates a draft only after every build and package check succeeds. See [v0.2.1 release notes](docs/releases/v0.2.1.md).
 
 Licensed under MIT.

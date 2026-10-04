@@ -1,0 +1,172 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example v0.2.1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  package:
+    name: Validate version and package plugin
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: 1.85.0
+          components: rustfmt, clippy
+      - name: Verify release tag and package versions
+        id: version
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RELEASE_TAG -cnotmatch '^v\d+\.\d+\.\d+$') {
+            throw 'A stable version tag in vX.Y.Z format is required.'
+          }
+          git show-ref --verify "refs/tags/$env:RELEASE_TAG"
+          if ($LASTEXITCODE -ne 0) { throw 'The release tag must already exist.' }
+          ./.github/scripts/package-release.ps1 -Mode Validate -ReleaseTag $env:RELEASE_TAG
+          "tag=$env:RELEASE_TAG" >> $env:GITHUB_OUTPUT
+      - name: Check formatting and lints
+        run: |
+          cargo fmt --all --check
+          if ($LASTEXITCODE -ne 0) { throw 'Formatting check failed.' }
+          cargo clippy --locked --all-targets --all-features -- -D warnings
+          if ($LASTEXITCODE -ne 0) { throw 'Clippy check failed.' }
+      - name: Verify crates.io package without publishing
+        run: |
+          cargo publish --dry-run --locked
+          if ($LASTEXITCODE -ne 0) { throw 'Cargo publication dry run failed.' }
+      - name: Create portable plugin archive
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: ./.github/scripts/package-release.ps1 -Mode Plugin -ReleaseTag $env:RELEASE_TAG -IncludeCrate
+      - name: Upload plugin and crate artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-common
+          path: target/release-assets/diffrail-*
+          if-no-files-found: error
+          retention-days: 14
+
+  build:
+    name: Build and test ${{ matrix.target }}
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            target: x86_64-pc-windows-msvc
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: macos-15
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.package.outputs.tag }}
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: 1.85.0
+          targets: ${{ matrix.target }}
+      - name: Test and build release executable
+        env:
+          RELEASE_TARGET: ${{ matrix.target }}
+        run: |
+          cargo test --locked --all-features --target $env:RELEASE_TARGET
+          if ($LASTEXITCODE -ne 0) { throw 'Release target tests failed.' }
+          cargo build --release --locked --target $env:RELEASE_TARGET
+          if ($LASTEXITCODE -ne 0) { throw 'Release target build failed.' }
+      - name: Package and smoke-test extracted executable
+        env:
+          RELEASE_TAG: ${{ needs.package.outputs.tag }}
+          RELEASE_TARGET: ${{ matrix.target }}
+        run: ./.github/scripts/package-release.ps1 -Mode Binary -ReleaseTag $env:RELEASE_TAG -Target $env:RELEASE_TARGET
+      - name: Upload binary archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-${{ matrix.target }}
+          path: target/release-assets/diffrail-*
+          if-no-files-found: error
+          retention-days: 14
+
+  draft:
+    name: Verify artifacts and create draft release
+    needs: [package, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Check out release notes and packaging helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.package.outputs.tag }}
+          persist-credentials: false
+      - name: Download all successful build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: release-*
+          path: target/release-assets
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Install pinned Rust toolchain for metadata validation
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: 1.85.0
+      - name: Verify complete release asset set and checksums
+        env:
+          RELEASE_TAG: ${{ needs.package.outputs.tag }}
+        run: ./.github/scripts/package-release.ps1 -Mode Checksums -ReleaseTag $env:RELEASE_TAG -RequireComplete
+      - name: Create or update draft only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.package.outputs.tag }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $assets = @(Get-ChildItem -LiteralPath target/release-assets -File | Sort-Object Name | ForEach-Object FullName)
+          $existingJson = & gh release view $env:RELEASE_TAG --json isDraft 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            if (-not ($existingJson | ConvertFrom-Json).isDraft) {
+              throw 'The release is already public; published artifacts will not be overwritten.'
+            }
+            gh release upload $env:RELEASE_TAG @assets --clobber
+            if ($LASTEXITCODE -ne 0) { throw 'Draft asset upload failed.' }
+            gh release edit $env:RELEASE_TAG --title "DiffRail $env:RELEASE_TAG" --notes-file "docs/releases/$env:RELEASE_TAG.md"
+            if ($LASTEXITCODE -ne 0) { throw 'Draft release notes update failed.' }
+          }
+          else {
+            gh release create $env:RELEASE_TAG @assets --draft --verify-tag --title "DiffRail $env:RELEASE_TAG" --notes-file "docs/releases/$env:RELEASE_TAG.md"
+            if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }
+          }
